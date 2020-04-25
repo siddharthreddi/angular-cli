@@ -105,7 +105,9 @@ export function applyPathTemplate<T extends PathTemplateData>(
         if (typeof replacement == 'function') {
           replacement = replacement.call(data, original);
         }
-
+        if (replacement === null) {
+          return null;
+        }
         if (replacement === undefined) {
           throw new OptionIsNotDefinedException(match);
         }
@@ -183,10 +185,12 @@ export function applyTemplates<T>(options: T): Rule {
         // See above for this weird cast.
         applyPathTemplate((options as {}) as PathTemplateData),
         (entry) => {
-          return {
-            content: entry.content,
-            path: entry.path.replace(TEMPLATE_FILENAME_RE, ''),
-          } as FileEntry;
+          return (
+            {
+              content: entry.content,
+              path: entry.path.replace(TEMPLATE_FILENAME_RE, ''),
+            } as FileEntry
+          );
         },
       ]),
     ),
